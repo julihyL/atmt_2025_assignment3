@@ -1,6 +1,6 @@
 #!/usr/bin/bash -l
 #SBATCH --partition teaching
-#SBATCH --time=0:15:0
+#SBATCH --time=1:00:0
 #SBATCH --ntasks=1
 #SBATCH --mem=8GB
 #SBATCH --cpus-per-task=1
@@ -34,6 +34,7 @@ python preprocess.py \
     --force-train
 
 python train.py \
+    --cuda \
     --data toy_example/data/prepared/ \
     --src-tokenizer toy_example/tokenizers/cz-bpe-1000.model \
     --tgt-tokenizer toy_example/tokenizers/en-bpe-1000.model \
