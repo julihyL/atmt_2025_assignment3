@@ -60,4 +60,6 @@ python translate.py \
     --tgt-tokenizer cz-en/tokenizers/en-bpe-8000.model \
     --checkpoint-path cz-en/checkpoints/checkpoint_best.pt \
     --output cz-en/output.txt \
-    --max-len 300
+    --max-len 300 \
+    --bleu \
+    --reference ~/shares/atomt.pilot.s3it.uzh/cz-en/data/raw/test.en
