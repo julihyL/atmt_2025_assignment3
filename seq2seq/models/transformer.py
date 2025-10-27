@@ -55,6 +55,7 @@ class TransformerModel(Seq2SeqModel):
             dim_ff=args.dim_feedforward_encoder,
             pretrained_embedding=encoder_pretrained_embedding, # currently unused
             n_encoder_layers=args.n_encoder_layers,
+            num_kv_heads = 1, # for MQA
         )
         decoder = TransformerDecoder(
             tgt_tokenizer=tgt_tokenizer,
@@ -65,7 +66,8 @@ class TransformerModel(Seq2SeqModel):
             n_decoder_layers=args.n_decoder_layers,
             dim_ff=args.dim_feedforward_decoder,
             pretrained_embedding=decoder_pretrained_embedding, # currently unused
-            use_cuda=args.cuda
+            use_cuda=args.cuda,
+            num_kv_heads = 1, # for MQA
         )
         return cls(encoder, decoder)
 
@@ -83,7 +85,8 @@ class TransformerEncoder(Seq2SeqEncoder):
                  n_attention_heads,
                  dim_ff,
                  pretrained_embedding,
-                 n_encoder_layers):
+                 n_encoder_layers,
+                 num_kv_heads = 1): # for MQA
         # initialize parent (but since our implementation uses a )
         super().__init__(src_tokenizer)
 
@@ -92,7 +95,7 @@ class TransformerEncoder(Seq2SeqEncoder):
         self.dim_embed = dim_embed  # 512
         self.tok_embed = nn.Embedding(self.src_vocab_size, dim_embed)  # Vocab Dictionary size , Embed size
         self.pos_embed = nn.Parameter(torch.zeros(1, max_seq_len, dim_embed))
-        self.encoder_blocks = nn.ModuleList([EncoderBlock(dim_embed, dropout, n_attention_heads, dim_ff) for _ in range(n_encoder_layers)])
+        self.encoder_blocks = nn.ModuleList([EncoderBlock(dim_embed, dropout, n_attention_heads, dim_ff, num_kv_heads) for _ in range(n_encoder_layers)]) # modified for MQA
         self.dropout = nn.Dropout(dropout)
         self.norm = nn.RMSNorm(dim_embed)
 
@@ -108,9 +111,9 @@ class TransformerEncoder(Seq2SeqEncoder):
 
 class EncoderBlock(nn.Module):
     '''EncoderBlock: self-attention -> position-wise fully connected feed-forward layer'''
-    def __init__(self, dim_embed, dropout, n_heads, dim_ff):
+    def __init__(self, dim_embed, dropout, n_heads, dim_ff, num_kv_heads):
         super(EncoderBlock, self).__init__()
-        self.atten = MultiHeadedAttention(n_heads, dim_embed, dropout)
+        self.atten = MultiHeadedAttention(n_heads, dim_embed, dropout, num_kv_heads)
         self.feed_forward = nn.Sequential(
             nn.Linear(dim_embed, dim_ff),
             nn.ReLU(),
@@ -140,14 +143,15 @@ class TransformerDecoder(Seq2SeqDecoder):
                  dim_ff: int,
                 #  unused for now
                  pretrained_embedding,
-                 use_cuda: bool):
+                 use_cuda: bool,
+                 num_kv_heads = 1): # for MQA
         super().__init__(tgt_tokenizer)
         self.tgt_vocab_size = tgt_tokenizer.GetPieceSize()
         self.dim_embed = dim_embed
         self.tok_embed = nn.Embedding(self.tgt_vocab_size, dim_embed)
         self.pos_embed = nn.Parameter(torch.zeros(1, max_seq_len, dim_embed))
         self.dropout = nn.Dropout(dropout)
-        self.decoder_blocks = nn.ModuleList([DecoderBlock( dim_embed, n_attention_heads, dropout, dim_ff ) for _ in range(n_decoder_layers)])
+        self.decoder_blocks = nn.ModuleList([DecoderBlock( dim_embed, n_attention_heads, dropout, dim_ff, num_kv_heads ) for _ in range(n_decoder_layers)])
         self.norm = nn.RMSNorm(dim_embed)
         self.linear = nn.Linear(dim_embed, self.tgt_vocab_size)
         self.device = torch.device("cuda" if use_cuda else "cpu")
@@ -174,48 +178,63 @@ class TransformerDecoder(Seq2SeqDecoder):
         logits = self.linear(x)
         return logits
 
-class MultiHeadedAttention(nn.Module):
-    def __init__(self, n_heads: int, dim_embed: int, dropout: float = 0.0):
-        super(MultiHeadedAttention, self).__init__()
-        #super().__init__()  python 3.x
-        assert dim_embed % n_heads == 0 # check the h number
-        self.d_k = dim_embed//n_heads
-        self.dim_embed = dim_embed    # 512
-        self.h = n_heads  # 8
-        self.WQ = nn.Linear(dim_embed, dim_embed)
-        self.WK = nn.Linear(dim_embed, dim_embed)
-        self.WV = nn.Linear(dim_embed, dim_embed) 
-        self.linear = nn.Linear(dim_embed, dim_embed)
+class MultiHeadedAttention(nn.Module): # modified for MQA
+    def __init__(self, n_heads: int, dim_embed: int, dropout: float = 0.0, num_kv_heads: int = 1):
+        super().__init__()
+        # Make sure the embedding dimension is divisible by the number of heads
+        assert dim_embed % n_heads == 0
+        assert n_heads % num_kv_heads == 0, "n_heads must be a multiple of num_kv_heads"
+
+        self.h = n_heads                         # Number of attention heads
+        self.d_k = dim_embed // n_heads          # Dimensionality per head
+        self.dim_embed = dim_embed               # Total embedding dimension
+        self.num_kv_heads = num_kv_heads         # Number of key/value heads (1 for MQA)
         self.dropout = nn.Dropout(dropout)
 
-    def forward(self, x_query, x_key, x_value, mask=None):
-        nbatch = x_query.size(0) # get batch size
-        # 1) Linear projections to get the multi-head query, key and value tensors
-        # x_query, x_key, x_value dimension: nbatch * seq_len * dim_embed
-        # LHS query, key, value dimensions: nbatch * h * seq_len * d_k
-        query = self.WQ(x_query).view(nbatch, -1, self.h, self.d_k).transpose(1,2)
-        key   = self.WK(x_key).view(nbatch, -1, self.h, self.d_k).transpose(1,2)
-        value = self.WV(x_value).view(nbatch, -1, self.h, self.d_k).transpose(1,2)
-        # 2) Attention
-        # scores has dimensions: nbatch * h * seq_len * seq_len
-        scores = torch.matmul(query, key.transpose(-2, -1))/math.sqrt(self.d_k)
-        # 3) Mask out padding tokens and future tokens
-        if mask is not None:
-            mask.unsqueeze(dim=1)
+        # Query projection: one set of weights per head (standard)
+        # Key/Value projection: shared across heads (Multi-Query)
+        self.WQ = nn.Linear(dim_embed, dim_embed)
+        self.WK = nn.Linear(dim_embed, self.num_kv_heads * self.d_k)
+        self.WV = nn.Linear(dim_embed, self.num_kv_heads * self.d_k)
+        self.linear = nn.Linear(dim_embed, dim_embed)
 
-            scores = scores.masked_fill(mask, float('-inf'))
-        # p_atten dimensions: nbatch * h * seq_len * seq_len
-        p_atten = torch.nn.functional.softmax(scores, dim=-1) # attention filter
-        p_atten = self.dropout(p_atten)
-        # x dimensions: nbatch * h * seq_len * d_k
-        # print("query shape:", query.shape)
-        # print("key shape:", key.shape)
-        # print("value shape:", value.shape)
-        # print("p_atten shape:", p_atten.shape)
-        x = torch.matmul(p_atten, value)  # filtered values
-        # x now has dimensions:nbatch * seq_len * dim_embed
-        x = x.transpose(1, 2).contiguous().view(nbatch, -1, self.dim_embed)
-        return self.linear(x) # final linear layer
+    def forward(self, x_query, x_key, x_value, mask=None):
+        bsz = x_query.size(0)
+
+        # 1) Compute Q, K, and V projections
+        # Q: [batch_size, n_heads, seq_len, d_k]
+        q = self.WQ(x_query).view(bsz, -1, self.h, self.d_k).transpose(1, 2)
+
+        # K/V: [batch_size, num_kv_heads, seq_len, d_k]
+        # In MQA, num_kv_heads = 1, so K and V are shared across all heads
+        k = self.WK(x_key).view(bsz, -1, self.num_kv_heads, self.d_k).transpose(1, 2)
+        v = self.WV(x_value).view(bsz, -1, self.num_kv_heads, self.d_k).transpose(1, 2)
+
+        # 2) Repeat shared K/V for each query head
+        k = k.repeat_interleave(self.h // self.num_kv_heads, dim=1)
+        v = v.repeat_interleave(self.h // self.num_kv_heads, dim=1)
+
+        # 3) Compute scaled dot-product attention
+        scores = torch.matmul(q, k.transpose(-2, -1)) / math.sqrt(self.d_k)
+
+        # Apply mask (e.g., padding or future/causal mask)
+        if mask is not None:
+            # accept [B, Lq, Lk] or [B, 1, Lq, Lk]
+            if mask.dim() == 3:
+                mask = mask.unsqueeze(1)  # -> [B,1,Lq,Lk]
+            scores = scores.masked_fill(mask, float('-inf'))  # broadcasts over head dim
+
+        # Softmax normalization and dropout on attention weights
+        attn = torch.nn.functional.softmax(scores, dim=-1)
+        attn = self.dropout(attn)
+
+        # 4) Apply attention weights to values
+        x = torch.matmul(attn, v)
+
+        # 5) Concatenate all heads and apply final linear projection
+        # x: [batch_size, seq_len, dim_embed]
+        x = x.transpose(1, 2).contiguous().view(bsz, -1, self.dim_embed)
+        return self.linear(x)
 
 class ResidualConnection(nn.Module):
     def __init__(self, dim, dropout):
@@ -229,10 +248,10 @@ class ResidualConnection(nn.Module):
 
 class DecoderBlock(nn.Module):
     ''' DecoderBlock: self-attention -> position-wise feed-forward (fully connected) layer'''
-    def __init__(self, dim_embed, n_heads, dropout, dim_ff):
+    def __init__(self, dim_embed, n_heads, dropout, dim_ff, num_kv_heads):
         super().__init__()
-        self.atten1 = MultiHeadedAttention(n_heads, dim_embed)
-        self.atten2 = MultiHeadedAttention(n_heads, dim_embed)
+        self.atten1 = MultiHeadedAttention(n_heads, dim_embed, dropout, num_kv_heads)
+        self.atten2 = MultiHeadedAttention(n_heads, dim_embed, dropout, num_kv_heads)
         self.feed_forward = nn.Sequential(
             nn.Linear(dim_embed, dim_ff),
             nn.ReLU(),
