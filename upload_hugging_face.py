@@ -1,7 +1,7 @@
 from huggingface_hub import HfApi
 import os
 
-repo_id = "hyluo/atmt_a3_MQA"  
+repo_id = "JulianaLuo/atmt_a3_MQA"  
 model_dir = "./cz-en"
 
 # Read Hugging Face token from environment variable
@@ -24,5 +24,6 @@ api.upload_folder(
 
 print("✅ Upload complete! You can check your model here:")
 print(f"https://huggingface.co/{repo_id}")
+
 
 
