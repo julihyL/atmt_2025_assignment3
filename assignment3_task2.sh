@@ -9,7 +9,7 @@
 
 module load gpu
 module load mamba
-source activate atmt
+source activate /scratch/zhidhu/atmt_new
 export XLA_FLAGS=--xla_gpu_cuda_data_dir=$CONDA_PREFIX/pkgs/cuda-toolkit
 
 
