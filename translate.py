@@ -13,7 +13,7 @@ from torch.serialization import default_restore_location
 import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-from seq2seq.decode import decode
+from seq2seq.decode import decode, beam_search_decode
 from seq2seq.data.tokenizer import BPETokenizer
 from seq2seq import models, utils
 from seq2seq.data.dataset import Seq2SeqDataset, BatchSampler
@@ -39,6 +39,7 @@ def get_args():
     parser.add_argument('--batch-size', default=1, type=int, help='maximum number of sentences in a batch')
     parser.add_argument('--output', required=True, type=str, help='path to the output file destination')
     parser.add_argument('--max-len', default=128, type=int, help='maximum length of generated sequence')
+    parser.add_argument('--beam-size', default=1, type=int, help='beam size for beam search decoding (1 = greedy)')
     
     # BLEU computation arguments
     parser.add_argument('--bleu', action='store_true', help='If set, compute BLEU score after translation')
@@ -63,9 +64,6 @@ def main(args):
     #                                     pad=src_tokenizer.pad_id(),
     #                                     max_seq_len=args.max_len)
     
-    
-
-
     # batch input sentences
     def batch_iter(lst, batch_size):
         for i in range(0, len(lst), batch_size):
@@ -152,13 +150,26 @@ def main(args):
 
             #-----------------------------------------
             # Decode without teacher forcing
-            prediction = decode(model=model,
-                                      src_tokens=src_tokens,
-                                      src_pad_mask=src_pad_mask,
-                                      max_out_len=args.max_len,
-                                      tgt_tokenizer=tgt_tokenizer,
-                                      args=args,
-                                      device=DEVICE)
+            if args.beam_size > 1:
+                prediction = beam_search_decode(
+                    model=model,
+                    src_tokens=src_tokens,
+                    src_pad_mask=src_pad_mask,
+                    beam_size=args.beam_size,
+                    max_out_len=args.max_len,
+                    tgt_tokenizer=tgt_tokenizer,
+                    device=DEVICE
+                )
+            else:
+                prediction = decode(
+                    model=model,
+                    src_tokens=src_tokens,
+                    src_pad_mask=src_pad_mask,
+                    max_out_len=args.max_len,
+                    tgt_tokenizer=tgt_tokenizer,
+                    args=args,
+                    device=DEVICE
+                )
             #----------------------------------------
 
         # Remove BOS and decode each sentence
