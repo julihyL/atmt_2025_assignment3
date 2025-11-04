@@ -58,8 +58,8 @@ python translate.py \
     --input ~/shares/cz-en/data/raw/test.cz \
     --src-tokenizer ./atmt_a3_MQA/tokenizers/en-bpe-8000.model \
     --tgt-tokenizer ./atmt_a3_MQA/tokenizers/en-bpe-8000.model \
-    --checkpoint-path cz-en/checkpoints_task2/checkpoint_best.pt \
-    --output cz-en/output_task2.txt \
+    --checkpoint-path ./atmt_a3_MQA/checkpoints/checkpoint_best.pt \
+    --output ./atmt_a3_MQA/output_task2.txt \
     --max-len 300 \
     --bleu \
     --reference ~/shares/atomt.pilot.s3it.uzh/cz-en/data/raw/test.en
