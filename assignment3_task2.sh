@@ -14,19 +14,19 @@ export XLA_FLAGS=--xla_gpu_cuda_data_dir=$CONDA_PREFIX/pkgs/cuda-toolkit
 
 
 # PREPARE DATA
-python preprocess.py \
-    --source-lang cz \
-    --target-lang en \
-    --raw-data ~/shares/cz-en/data/raw \
-    --dest-dir ./cz-en/data/prepared \
-    --model-dir ./cz-en/tokenizers \
-    --test-prefix test \
-    --train-prefix train \
-    --valid-prefix valid \
-    --src-vocab-size 8000 \
-    --tgt-vocab-size 8000 \
-    --src-model ./cz-en/tokenizers/cz-bpe-8000.model \
-    --tgt-model ./cz-en/tokenizers/en-bpe-8000.model
+# python preprocess.py \
+#     --source-lang cz \
+#     --target-lang en \
+#     --raw-data ~/shares/cz-en/data/raw \
+#     --dest-dir ./cz-en/data/prepared \
+#     --model-dir ./cz-en/tokenizers \
+#     --test-prefix test \
+#     --train-prefix train \
+#     --valid-prefix valid \
+#     --src-vocab-size 8000 \
+#     --tgt-vocab-size 8000 \
+#     --src-model ./cz-en/tokenizers/cz-bpe-8000.model \
+#     --tgt-model ./cz-en/tokenizers/en-bpe-8000.model
 
 # # TRAIN
 # python train.py \
@@ -57,9 +57,9 @@ python translate.py \
     --cuda \
     --beam-size 1 \
     --input ~/shares/cz-en/data/raw/test.cz \
-    --src-tokenizer ./cz-en/tokenizers/cz-bpe-8000.model \
-    --tgt-tokenizer ./cz-en/tokenizers/en-bpe-8000.model \
-    --checkpoint-path ./cz-en/checkpoints/checkpoint_best.pt \
+    --src-tokenizer ./atmt_a3_MQA/tokenizers/cz-bpe-8000.model \
+    --tgt-tokenizer ./atmt_a3_MQA/tokenizers/en-bpe-8000.model \
+    --checkpoint-path ./atmt_a3_MQA/checkpoints/checkpoint_last.pt \
     --output ./out_put/output_task2.txt \
     --max-len 300 \
     --bleu \
