@@ -1,0 +1,42 @@
+
+Filesystems usage for user zhidhu ( uid 646318923 ):
+-------------------------------------------------------------------------------------
+Directory                       Used   Limit   Used,%         Files     Limit
+-------------------------------------------------------------------------------------
+/home/zhidhu                   6.6GB    15GB    43.9%         21000    100000
+/data/zhidhu                    18GB   200GB     8.6%         33191          
+/scratch/zhidhu                7.6GB    20TB     0.0%         36305          
+
+/shares/atomt.pilot.s3it.uzh    21GB    10TB     0.2%          1495          
+-------------------------------------------------------------------------------------
+
+Files on /scratch may be purged after 30 days.
+See https://docs.s3it.uzh.ch/cluster/data
+
+INFO:root:Loaded SentencePiece model for cz from ./cz-en/tokenizers/cz-bpe-8000.model
+INFO:root:Loaded SentencePiece model for en from ./cz-en/tokenizers/en-bpe-8000.model
+INFO:root:File ./cz-en/data/prepared/train.cz already exists, skipping...
+INFO:root:File ./cz-en/data/prepared/valid.cz already exists, skipping...
+INFO:root:File ./cz-en/data/prepared/test.cz already exists, skipping...
+INFO:root:File ./cz-en/data/prepared/train.en already exists, skipping...
+INFO:root:File ./cz-en/data/prepared/valid.en already exists, skipping...
+INFO:root:File ./cz-en/data/prepared/test.en already exists, skipping...
+INFO:root:Data processing complete!
+Vocabulary saved to cz-en/tokenizers/cz-bpe-8000.vocab
+Vocabulary saved to cz-en/tokenizers/en-bpe-8000.vocab
+Traceback (most recent call last):
+  File "/data/zhidhu/atmt_2025_assignment3/translate.py", line 205, in <module>
+    main(args)
+  File "/data/zhidhu/atmt_2025_assignment3/translate.py", line 55, in main
+    state_dict = torch.load(args.checkpoint_path, map_location=lambda s, l: default_restore_location(s, 'cpu'), weights_only=False)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/zhidhu/.local/lib/python3.12/site-packages/torch/serialization.py", line 1484, in load
+    with _open_file_like(f, "rb") as opened_file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/zhidhu/.local/lib/python3.12/site-packages/torch/serialization.py", line 759, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/zhidhu/.local/lib/python3.12/site-packages/torch/serialization.py", line 740, in __init__
+    super().__init__(open(name, mode))
+                     ^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: './cz-en/checkpoints/checkpoint_best.pt'
