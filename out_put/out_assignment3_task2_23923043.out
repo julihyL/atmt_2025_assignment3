@@ -1,0 +1,28 @@
+
+Filesystems usage for user zhidhu ( uid 646318923 ):
+-------------------------------------------------------------------------------------
+Directory                       Used   Limit   Used,%         Files     Limit
+-------------------------------------------------------------------------------------
+/home/zhidhu                   6.6GB    15GB    43.9%         21000    100000
+/data/zhidhu                    18GB   200GB     8.6%         33226          
+/scratch/zhidhu                7.6GB    20TB     0.0%         36305          
+
+/shares/atomt.pilot.s3it.uzh    21GB    10TB     0.2%          1495          
+-------------------------------------------------------------------------------------
+
+Files on /scratch may be purged after 30 days.
+See https://docs.s3it.uzh.ch/cluster/data
+
+[2025-11-05 15:10:26] COMMAND: translate.py --cuda --beam-size 4 --input /home/zhidhu/shares/cz-en/data/raw/test.cz --src-tokenizer ./atmt_a3_MQA/tokenizers/cz-bpe-8000.model --tgt-tokenizer ./atmt_a3_MQA/tokenizers/en-bpe-8000.model --checkpoint-path ./atmt_a3_MQA/checkpoints/checkpoint_last.pt --output ./out_put/output_task2.txt --max-len 300 --bleu --reference /home/zhidhu/shares/atomt.pilot.s3it.uzh/cz-en/data/raw/test.en
+[2025-11-05 15:10:26] Arguments: {'cuda': True, 'data': 'cz-en/data/prepared/', 'source_lang': 'cz', 'target_lang': 'en', 'src_tokenizer': './atmt_a3_MQA/tokenizers/cz-bpe-8000.model', 'tgt_tokenizer': './atmt_a3_MQA/tokenizers/en-bpe-8000.model', 'max_tokens': None, 'batch_size': 1, 'train_on_tiny': False, 'arch': 'transformer', 'max_epoch': 7, 'clip_norm': 4.0, 'lr': 0.0003, 'patience': 3, 'max_length': 300, 'log_file': 'cz-en/logs/train.log', 'save_dir': 'cz-en/checkpoints/', 'restore_file': 'checkpoint_last.pt', 'save_interval': 1, 'no_save': False, 'epoch_checkpoints': False, 'ignore_checkpoints': True, 'encoder_dropout': 0.1, 'decoder_dropout': 0.1, 'dim_embedding': 256, 'attention_heads': 4, 'dim_feedforward_encoder': 1024, 'dim_feedforward_decoder': 1024, 'max_seq_len': 300, 'n_encoder_layers': 3, 'n_decoder_layers': 3, 'encoder_embed_path': None, 'decoder_embed_path': None, 'seed': 42, 'input': '/home/zhidhu/shares/cz-en/data/raw/test.cz', 'checkpoint_path': './atmt_a3_MQA/checkpoints/checkpoint_last.pt', 'output': './out_put/output_task2.txt', 'max_len': 300, 'beam_size': 4, 'bleu': True, 'reference': '/home/zhidhu/shares/atomt.pilot.s3it.uzh/cz-en/data/raw/test.en'}
+[2025-11-05 15:10:26] Loaded a model from checkpoint ./atmt_a3_MQA/checkpoints/checkpoint_last.pt
+PAD ID: 3, BOS ID: 1, EOS ID: 2
+          PAD token: "<pad>", BOS token: "<s>", EOS token: "</s>"
+0it [00:00, ?it/s]0it [00:00, ?it/s]
+Traceback (most recent call last):
+  File "/data/zhidhu/atmt_2025_assignment3/translate.py", line 205, in <module>
+    main(args)
+  File "/data/zhidhu/atmt_2025_assignment3/translate.py", line 154, in main
+    prediction = beam_search_decode(
+                 ^^^^^^^^^^^^^^^^^^^
+TypeError: beam_search_decode() missing 1 required positional argument: 'args'
