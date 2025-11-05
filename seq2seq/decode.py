@@ -48,7 +48,6 @@ def beam_search_decode(
     src_pad_mask: torch.Tensor,
     max_out_len: int,
     tgt_tokenizer: spm.SentencePieceProcessor,
-    args,
     device: torch.device,
     beam_size: int = 4
 ) -> list:

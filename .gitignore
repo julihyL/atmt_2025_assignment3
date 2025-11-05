@@ -9,7 +9,6 @@ old_files_and_debugging/
 changes.md
 repo_outline.md
 trim.py
-beam_search.md
 
 # toy example outputs
 
@@ -21,6 +20,7 @@ toy_example/toy_example_output.en
 # other outputs
 /example
 /cz-en
+/beam_search
 
 # unused
 seq2seq/embedding_saver.py
