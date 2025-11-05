@@ -25,8 +25,8 @@ python preprocess.py \
     --valid-prefix valid \
     --src-vocab-size 8000 \
     --tgt-vocab-size 8000 \
-    --src-model ./atmt_a3_MQA/tokenizers/cz-bpe-8000.model \
-    --tgt-model ./atmt_a3_MQA/tokenizers/en-bpe-8000.model
+    --src-model ./cz-en/tokenizers/cz-bpe-8000.model \
+    --tgt-model ./cz-en/tokenizers/en-bpe-8000.model
 
 # # TRAIN
 # python train.py \
@@ -55,11 +55,12 @@ python preprocess.py \
 # TRANSLATE
 python translate.py \
     --cuda \
+    --beam-size 1 \
     --input ~/shares/cz-en/data/raw/test.cz \
-    --src-tokenizer ./atmt_a3_MQA/tokenizers/en-bpe-8000.model \
-    --tgt-tokenizer ./atmt_a3_MQA/tokenizers/en-bpe-8000.model \
-    --checkpoint-path ./atmt_a3_MQA/checkpoints/checkpoint_best.pt \
-    --output ./atmt_a3_MQA/output_task2.txt \
+    --src-tokenizer cz-en/tokenizers/cz-bpe-8000.model \
+    --tgt-tokenizer cz-en/tokenizers/en-bpe-8000.model \
+    --checkpoint-path cz-en/checkpoints/checkpoint_best.pt \
+    --output ./out_put/output_task2.txt \
     --max-len 300 \
     --bleu \
     --reference ~/shares/atomt.pilot.s3it.uzh/cz-en/data/raw/test.en
