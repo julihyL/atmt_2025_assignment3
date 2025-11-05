@@ -5,7 +5,7 @@
 #SBATCH --mem=16GB
 #SBATCH --cpus-per-task=1
 #SBATCH --gpus=1
-#SBATCH --output=out_assignment3_task2_%j.out
+#SBATCH --output=out_put/out_assignment3_task2_%j.out
 
 module load gpu
 module load mamba
@@ -57,9 +57,9 @@ python translate.py \
     --cuda \
     --beam-size 1 \
     --input ~/shares/cz-en/data/raw/test.cz \
-    --src-tokenizer cz-en/tokenizers/cz-bpe-8000.model \
-    --tgt-tokenizer cz-en/tokenizers/en-bpe-8000.model \
-    --checkpoint-path cz-en/checkpoints/checkpoint_best.pt \
+    --src-tokenizer ./cz-en/tokenizers/cz-bpe-8000.model \
+    --tgt-tokenizer ./cz-en/tokenizers/en-bpe-8000.model \
+    --checkpoint-path ./cz-en/checkpoints/checkpoint_best.pt \
     --output ./out_put/output_task2.txt \
     --max-len 300 \
     --bleu \
