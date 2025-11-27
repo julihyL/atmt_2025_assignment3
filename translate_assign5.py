@@ -18,7 +18,7 @@ from seq2seq.data.tokenizer import BPETokenizer
 from seq2seq import models, utils
 from seq2seq.data.dataset import Seq2SeqDataset, BatchSampler
 
-FUNC = {"Before": [beam_search_decode, decode],"After": [beam_search_decode_opt, decode_opt]}
+FUNC = {"After": [beam_search_decode_opt, decode_opt],"Before": [beam_search_decode, decode]}
 
 def decode_to_string(tokenizer, array):
     """
