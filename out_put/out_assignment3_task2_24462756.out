@@ -1,0 +1,37 @@
+
+Filesystems usage for user zhidhu ( uid 646318923 ):
+-------------------------------------------------------------------------------------
+Directory                       Used   Limit   Used,%         Files     Limit
+-------------------------------------------------------------------------------------
+/home/zhidhu                   6.6GB    15GB    43.9%         21000    100000
+/data/zhidhu                    18GB   200GB     8.6%         33275          
+/scratch/zhidhu                7.6GB    20TB     0.0%         36305          
+
+/shares/atomt.pilot.s3it.uzh    29GB    10TB     0.3%          2579          
+-------------------------------------------------------------------------------------
+
+Files on /scratch may be purged after 30 days.
+See https://docs.s3it.uzh.ch/cluster/data
+
+[2025-11-27 15:32:10] COMMAND: translate_assign5.py --cuda --beam-size 1,3,5 --input /home/zhidhu/shares/cz-en/data/raw/test.cz --src-tokenizer ./atmt_a3_MQA/tokenizers/cz-bpe-8000.model --tgt-tokenizer ./atmt_a3_MQA/tokenizers/en-bpe-8000.model --checkpoint-path ./atmt_a3_MQA/checkpoints/checkpoint_last.pt --output ./out_put/output_task2_opt.txt --max-len 300 --bleu --reference /home/zhidhu/shares/atomt.pilot.s3it.uzh/cz-en/data/raw/test.en
+[2025-11-27 15:32:10] Arguments: {'cuda': True, 'data': 'cz-en/data/prepared/', 'source_lang': 'cz', 'target_lang': 'en', 'src_tokenizer': './atmt_a3_MQA/tokenizers/cz-bpe-8000.model', 'tgt_tokenizer': './atmt_a3_MQA/tokenizers/en-bpe-8000.model', 'max_tokens': None, 'batch_size': 1, 'train_on_tiny': False, 'arch': 'transformer', 'max_epoch': 7, 'clip_norm': 4.0, 'lr': 0.0003, 'patience': 3, 'max_length': 300, 'log_file': 'cz-en/logs/train.log', 'save_dir': 'cz-en/checkpoints/', 'restore_file': 'checkpoint_last.pt', 'save_interval': 1, 'no_save': False, 'epoch_checkpoints': False, 'ignore_checkpoints': True, 'encoder_dropout': 0.1, 'decoder_dropout': 0.1, 'dim_embedding': 256, 'attention_heads': 4, 'dim_feedforward_encoder': 1024, 'dim_feedforward_decoder': 1024, 'max_seq_len': 300, 'n_encoder_layers': 3, 'n_decoder_layers': 3, 'encoder_embed_path': None, 'decoder_embed_path': None, 'seed': 42, 'input': '/home/zhidhu/shares/cz-en/data/raw/test.cz', 'checkpoint_path': './atmt_a3_MQA/checkpoints/checkpoint_last.pt', 'output': './out_put/output_task2_opt.txt', 'max_len': 300, 'beam_size': [1, 3, 5], 'alpha': 0.7, 'bleu': True, 'reference': '/home/zhidhu/shares/atomt.pilot.s3it.uzh/cz-en/data/raw/test.en'}
+[2025-11-27 15:32:10] We are loading tokenizer...
+[2025-11-27 15:32:12] Loaded a model from checkpoint ./atmt_a3_MQA/checkpoints/checkpoint_last.pt
+[2025-11-27 15:32:12] We are translating on 100 texts.
+[2025-11-27 15:32:12] PAD ID: 3, BOS ID: 1, EOS ID: 2
+          PAD token: "<pad>", BOS token: "<s>", EOS token: "</s>"
+[2025-11-27 15:32:12] Now we after testing the time After optimization
+[2025-11-27 15:32:12] Now we are testing on 1 candidates
+Beam size 1: 0it [00:00, ?it/s]Beam size 1: 1it [00:00,  1.12it/s]Beam size 1: 2it [00:01,  2.17it/s]Beam size 1: 5it [00:01,  5.96it/s]Beam size 1: 7it [00:01,  7.93it/s]Beam size 1: 9it [00:01,  9.94it/s]Beam size 1: 12it [00:01, 12.71it/s]Beam size 1: 14it [00:01, 14.20it/s]Beam size 1: 16it [00:01, 15.10it/s]Beam size 1: 18it [00:02, 13.47it/s]Beam size 1: 20it [00:02, 11.33it/s]Beam size 1: 22it [00:02, 12.54it/s]Beam size 1: 24it [00:02, 13.81it/s]Beam size 1: 27it [00:02, 17.21it/s]Beam size 1: 29it [00:02, 15.78it/s]Beam size 1: 31it [00:02, 15.63it/s]Beam size 1: 34it [00:03, 13.26it/s]Beam size 1: 36it [00:03,  9.40it/s]Beam size 1: 38it [00:03, 10.85it/s]Beam size 1: 40it [00:03, 12.04it/s]Beam size 1: 43it [00:03, 14.35it/s]Beam size 1: 45it [00:04, 15.13it/s]Beam size 1: 48it [00:04, 16.99it/s]Beam size 1: 51it [00:04, 17.95it/s]Beam size 1: 53it [00:04, 18.33it/s]Beam size 1: 56it [00:04, 21.11it/s]Beam size 1: 59it [00:04, 21.30it/s]Beam size 1: 62it [00:04, 22.69it/s]Beam size 1: 65it [00:04, 24.34it/s]Beam size 1: 68it [00:05, 23.25it/s]Beam size 1: 71it [00:05, 20.36it/s]Beam size 1: 74it [00:05, 19.58it/s]Beam size 1: 77it [00:05, 17.55it/s]Beam size 1: 79it [00:05, 17.38it/s]Beam size 1: 81it [00:05, 17.87it/s]Beam size 1: 83it [00:05, 16.49it/s]Beam size 1: 86it [00:06, 19.62it/s]Beam size 1: 89it [00:06, 19.65it/s]Beam size 1: 92it [00:06, 19.23it/s]Beam size 1: 95it [00:06, 18.85it/s]Beam size 1: 97it [00:06, 18.61it/s]Beam size 1: 99it [00:06, 18.27it/s]Beam size 1: 100it [00:06, 14.69it/s]
+[2025-11-27 15:32:20] Wrote 100 lines to ./out_put/output_task2_opt.txt.beam1
+[2025-11-27 15:32:20] Translation After optimization with beam size 1 completed in 7.50 seconds
+[2025-11-27 15:32:20] BLEU score for beam size 1: 20.13
+[2025-11-27 15:32:20] Now we are testing on 3 candidates
+Beam size 3: 0it [00:00, ?it/s]Beam size 3: 0it [00:00, ?it/s]
+Traceback (most recent call last):
+  File "/data/zhidhu/atmt_2025_assignment3/translate_assign5.py", line 211, in <module>
+    main(args)
+  File "/data/zhidhu/atmt_2025_assignment3/translate_assign5.py", line 170, in main
+    prediction = funcs[0](model=model,
+                 ^^^^^^^^^^^^^^^^^^^^^
+TypeError: beam_search_decode_opt() got an unexpected keyword argument 'alpha'
