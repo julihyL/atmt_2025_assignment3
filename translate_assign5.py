@@ -185,7 +185,7 @@ def main(args):
                         with open(output_path, 'a', encoding="utf-8") as out_file:
                             out_file.write(translation + '\n')
 
-            print(f"translations for beam size {beam_size}: {translations}")
+            logging.info(f"translations for beam size {beam_size}: {translations}")
             logging.info(f'Wrote {len(translations)} lines to {output_path}')
             end_time = time.perf_counter()
             logging.info(f'Translation {name} optimization with beam size {beam_size} completed in {end_time - start_time:.2f} seconds')
@@ -194,10 +194,11 @@ def main(args):
             if getattr(args, 'bleu', False):
                 with open(args.reference, encoding='utf-8') as ref_file:
                     references = [line.strip() for line in ref_file if line.strip()]
+                references = references[:100]
                 if len(references) != len(translations):
                     raise ValueError(f"Reference ({len(references)}) and hypothesis ({len(translations)}) line counts do not match.")
                 bleu = sacrebleu.corpus_bleu(translations, [references])
-                print(f"BLEU score for beam size {beam_size}: {bleu.score:.2f}")
+                logging.info(f"BLEU score for beam size {beam_size}: {bleu.score:.2f}")
 
 
 if __name__ == '__main__':
