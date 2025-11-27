@@ -50,7 +50,7 @@ def decode_opt(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pad_mask: torc
     finished = torch.zeros(batch_size, dtype=torch.bool, device=device)
 
     with torch.no_grad():
-        memory = model.encode(src_tokens, src_pad_mask) 
+        memory = model.encoder(src_tokens, src_pad_mask) 
 
     for t in range(max_out_len):
         max_len = model.decoder.pos_embed.size(1)
@@ -120,7 +120,7 @@ def beam_search_decode_opt(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pa
     BOS, EOS, PAD = tgt_tokenizer.bos_id(), tgt_tokenizer.eos_id(), tgt_tokenizer.pad_id()
     
     with torch.no_grad():
-        memory = model.encode(src_tokens, src_pad_mask)
+        memory = model.encoder(src_tokens, src_pad_mask)
 
     beams = [(torch.tensor([[BOS]], device=device), 0.0)]
     

@@ -185,7 +185,7 @@ def main(args):
                         with open(output_path, 'a', encoding="utf-8") as out_file:
                             out_file.write(translation + '\n')
 
-            logging.info(f"translations for beam size {beam_size}: {translations}")
+            # logging.info(f"translations for beam size {beam_size}: {translations}")
             logging.info(f'Wrote {len(translations)} lines to {output_path}')
             end_time = time.perf_counter()
             logging.info(f'Translation {name} optimization with beam size {beam_size} completed in {end_time - start_time:.2f} seconds')
