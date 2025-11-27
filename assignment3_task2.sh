@@ -53,9 +53,9 @@ export XLA_FLAGS=--xla_gpu_cuda_data_dir=$CONDA_PREFIX/pkgs/cuda-toolkit
 #     --n-decoder-layers 3 
 
 # TRANSLATE
-python translate.py \
+python translate_assign5.py \
     --cuda \
-    --beam-size 4 \
+    --beam-size 1,3,5 \
     --input ~/shares/cz-en/data/raw/test.cz \
     --src-tokenizer ./atmt_a3_MQA/tokenizers/cz-bpe-8000.model \
     --tgt-tokenizer ./atmt_a3_MQA/tokenizers/en-bpe-8000.model \
