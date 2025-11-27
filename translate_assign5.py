@@ -64,7 +64,7 @@ def main(args):
     args = args_loaded
     utils.init_logging(args)
 
-
+    logging.info("We are loading tokenizer...")
     src_tokenizer = utils.load_tokenizer(args.src_tokenizer)
     tgt_tokenizer = utils.load_tokenizer(args.tgt_tokenizer)
     
@@ -87,6 +87,7 @@ def main(args):
 
     # Limit to first 100 examples
     src_lines = src_lines[:100]
+    logging.info(f"We are translating on {len(src_lines)} texts.")
 
     # Encode input sentences
     src_encoded = [torch.tensor(src_tokenizer.Encode(line, out_type=int, add_eos=True)) for line in src_lines]
@@ -98,7 +99,7 @@ def main(args):
     PAD = src_tokenizer.pad_id()
     BOS = tgt_tokenizer.bos_id()
     EOS = tgt_tokenizer.eos_id()
-    print(f'PAD ID: {PAD}, BOS ID: {BOS}, EOS ID: {EOS}\n\
+    logging.info(f'PAD ID: {PAD}, BOS ID: {BOS}, EOS ID: {EOS}\n\
           PAD token: "{src_tokenizer.IdToPiece(PAD)}", BOS token: "{tgt_tokenizer.IdToPiece(BOS)}", EOS token: "{tgt_tokenizer.IdToPiece(EOS)}"')
 
     def postprocess_ids(ids, pad, bos, eos):
@@ -124,10 +125,11 @@ def main(args):
 
     make_batch = utils.make_batch_input(device=DEVICE, pad=src_tokenizer.pad_id(), max_seq_len=args.max_len)
 
-    for name, funcs in FUNC:
+    for name, funcs in FUNC.items():
         logging.info(f"Now we after testing the time {name} optimization")
         # For each beam size, translate and write output to separate file
         for beam_size in args.beam_size:
+            logging.info(f"Now we are testing on {beam_size} candidates")
             translations = []
             start_time = time.perf_counter()
 
