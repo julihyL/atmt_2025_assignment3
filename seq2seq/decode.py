@@ -59,7 +59,12 @@ def decode_opt(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pad_mask: torc
         
         trg_pad_mask = (generated == PAD).unsqueeze(1).unsqueeze(2)
 
-        output = model.decoder(generated, memory, trg_pad_mask, src_pad_mask)
+        output = model.decoder(
+            memory,
+            src_pad_mask,
+            generated,
+            trg_pad_mask
+        ).to(device)
         
         next_token_logits = output[:, -1, :]
         next_tokens = next_token_logits.argmax(dim=-1, keepdim=True)
@@ -138,7 +143,12 @@ def beam_search_decode_opt(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pa
                 
                 trg_pad_mask = (seq == PAD)[:, None, None, :]
                 
-                decoder_output = model.decoder(seq, memory, trg_pad_mask, src_pad_mask)
+                decoder_output = model.decoder(
+                                    memory,
+                                    src_pad_mask,
+                                    seq,
+                                    trg_pad_mask
+                                )
                 logits = decoder_output[:, -1, :]
                 
                 log_probs = torch.nn.functional.log_softmax(logits, dim=-1)
