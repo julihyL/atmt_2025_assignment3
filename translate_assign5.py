@@ -19,7 +19,7 @@ from seq2seq import models, utils
 from seq2seq.data.dataset import Seq2SeqDataset, BatchSampler
 
 # FUNC = {"After": [beam_search_decode_opt, decode_opt],"Before": [beam_search_decode, decode]}
-FUNC = {"Max_Candidate": [beam_search_decode_max_candidates], "Relative_Threshold":[beam_search_decode_relative_threshold], "Cache_OPT": [beam_search_decode_opt]}
+FUNC = {"Relative_Threshold":[beam_search_decode_relative_threshold],"Max_Candidate": [beam_search_decode_max_candidates], "Cache_OPT": [beam_search_decode_opt]}
 
 def decode_to_string(tokenizer, array):
     """

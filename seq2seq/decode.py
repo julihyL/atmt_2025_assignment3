@@ -208,6 +208,11 @@ def beam_search_decode_relative_threshold(model: Seq2SeqModel, src_tokens: torch
         threshold = rp * max_score
         pruned_beams = [(s, sc) for (s, sc) in new_beams if sc >= threshold]
 
+        # To make at least there is one beam.
+        if len(pruned_beams) == 0:
+            best_candidate = max(new_beams, key=lambda x: x[1])
+            pruned_beams = [best_candidate]
+
         # Keep the best beams after pruning
         beams = sorted(pruned_beams, key=lambda x: x[1], reverse=True)[:beam_size]
 
