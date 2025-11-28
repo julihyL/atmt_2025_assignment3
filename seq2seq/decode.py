@@ -166,7 +166,7 @@ def beam_search_decode_opt(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pa
 
 def beam_search_decode_relative_threshold(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pad_mask: torch.Tensor,
                                           max_out_len: int, tgt_tokenizer: spm.SentencePieceProcessor, args,
-                                          device: torch.device, beam_size: int = 5, rp: float = 0.6):
+                                          device: torch.device, beam_size: int = 5, rp: float = 0.6,alpha: float = 0.7):
     """
     Beam search with Relative Threshold Pruning.
     A candidate is discarded if score <= rp * max_score.
@@ -220,7 +220,7 @@ def beam_search_decode_relative_threshold(model: Seq2SeqModel, src_tokens: torch
 
 def beam_search_decode_max_candidates(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pad_mask: torch.Tensor,
                                       max_out_len: int, tgt_tokenizer: spm.SentencePieceProcessor, args,
-                                      device: torch.device, beam_size: int = 5, mc: int = 2):
+                                      device: torch.device, beam_size: int = 5, mc: int = 2,alpha: float = 0.7):
     """
     Beam search with Maximum Candidates per Node pruning.
     For each history (prefix), only keep top mc continuations.
