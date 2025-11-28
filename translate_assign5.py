@@ -136,7 +136,7 @@ def main(args):
 
             # Clear output file for this beam size
             if args.output is not None:
-                output_path = f"{name}{args.output}.beam{beam_size}"
+                output_path = f"{args.output}.{name}.beam{beam_size}"
                 with open(output_path, 'w', encoding="utf-8") as out_file:
                     out_file.write('')
 
