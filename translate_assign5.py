@@ -13,12 +13,13 @@ from torch.serialization import default_restore_location
 import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-from seq2seq.decode import beam_search_decode, decode, beam_search_decode_opt, decode_opt
+from seq2seq.decode import beam_search_decode, decode, beam_search_decode_opt, decode_opt, beam_search_decode_relative_threshold, beam_search_decode_max_candidates
 from seq2seq.data.tokenizer import BPETokenizer
 from seq2seq import models, utils
 from seq2seq.data.dataset import Seq2SeqDataset, BatchSampler
 
 FUNC = {"After": [beam_search_decode_opt, decode_opt],"Before": [beam_search_decode, decode]}
+FUNC = {"Max_Candidate": [beam_search_decode_max_candidates], "Relative_Threshold":[beam_search_decode_relative_threshold], "Cache_OPT": [beam_search_decode_opt]}
 
 def decode_to_string(tokenizer, array):
     """
@@ -135,7 +136,7 @@ def main(args):
 
             # Clear output file for this beam size
             if args.output is not None:
-                output_path = f"{args.output}.beam{beam_size}"
+                output_path = f"{name}{args.output}.beam{beam_size}"
                 with open(output_path, 'w', encoding="utf-8") as out_file:
                     out_file.write('')
 
@@ -185,7 +186,7 @@ def main(args):
                         with open(output_path, 'a', encoding="utf-8") as out_file:
                             out_file.write(translation + '\n')
 
-            # logging.info(f"translations for beam size {beam_size}: {translations}")
+            logging.info(f"translations for beam size {beam_size}: {translations}")
             logging.info(f'Wrote {len(translations)} lines to {output_path}')
             end_time = time.perf_counter()
             logging.info(f'Translation {name} optimization with beam size {beam_size} completed in {end_time - start_time:.2f} seconds')
