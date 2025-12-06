@@ -81,12 +81,18 @@ def decode_opt(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pad_mask: torc
         predicted_tokens.append(seq)
     return predicted_tokens
 
-def beam_search_decode(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pad_mask: torch.Tensor, max_out_len: int, tgt_tokenizer: spm.SentencePieceProcessor, args, device: torch.device, beam_size: int = 5, alpha: float = 0.7):
+def beam_search_decode(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pad_mask: torch.Tensor, max_out_len: int,
+                       tgt_tokenizer: spm.SentencePieceProcessor, args, device: torch.device, beam_size: int = 5, alpha: float = 0.7):
     """Beam Search decoding compatible with Transformer-based Seq2Seq models."""
     model.eval()
     BOS, EOS, PAD = tgt_tokenizer.bos_id(), tgt_tokenizer.eos_id(), tgt_tokenizer.pad_id()
     # __QUESTION 1: what does this line set up and why is the beam represented this way?
     beams = [(torch.tensor([[BOS]], device=device), 0.0)]
+
+    # Add function for length normalization
+    def length_normalized_score(log_prob: float, length: int, alpha: float) -> float:
+        return log_prob * ((6.0 / (5.0 + length)) ** alpha)
+    
     for _ in range(max_out_len):
         new_beams = []
         for seq, score in beams:
@@ -110,14 +116,17 @@ def beam_search_decode(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pad_ma
                 new_score = score + topk_log_probs[:, k].item()
                 new_beams.append((new_seq, new_score))
 
-        beams = sorted(new_beams, key=lambda x: x[1], reverse=True)[:beam_size]
+        # Change to length normalization
+        # beams = sorted(new_beams, key=lambda x: x[1], reverse=True)[:beam_size]
+        beams = sorted(new_beams, key=lambda x: length_normalized_score(log_prob=x[1], length=x[0].size(1), alpha=alpha), reverse=True)[:beam_size]\
+        
         # __QUESTION 5: Why do we check for EOS here and what does it imply for beam search?
         if all(seq[0, -1].item() == EOS for seq, _ in beams):
             break
     best_seq, _ = beams[0]
     # __QUESTION 6: What is returned, and why are we squeezing, converting to list and wrapping in another list here?
     return [best_seq.squeeze(0).tolist()]
-
+                                  
 def beam_search_decode_opt(model: Seq2SeqModel, src_tokens: torch.Tensor, src_pad_mask: torch.Tensor, max_out_len: int, tgt_tokenizer: spm.SentencePieceProcessor, args, device: torch.device, beam_size: int = 5, alpha: float = 0.7):
     model.eval()
     BOS, EOS, PAD = tgt_tokenizer.bos_id(), tgt_tokenizer.eos_id(), tgt_tokenizer.pad_id()
