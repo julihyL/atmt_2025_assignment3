@@ -63,6 +63,7 @@ python translate.py \
     --checkpoint-path toy_example/checkpoints/checkpoint_best.pt \
     --batch-size 1 \
     --max-len 100 \
+    --beam-size \
     --alpha \
     --output toy_example/toy_example_output_alpha_default.en \
     --bleu \
