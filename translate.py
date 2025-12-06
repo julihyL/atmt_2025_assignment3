@@ -125,7 +125,10 @@ def main(args):
     
 
     translations = []
+    output_length = [] # added for comparing the average length affecred by different alpha value
     start_time = time.perf_counter()
+
+    
 
     make_batch = utils.make_batch_input(device=DEVICE, pad=src_tokenizer.pad_id(), max_seq_len=args.max_len)
 
@@ -175,6 +178,7 @@ def main(args):
         for sent in prediction:
             translation = decode_sentence(tgt_tokenizer, sent)
             translations.append(translation)
+            output_lengths.append(len(sent)) # record the length of each sentence
             if args.output is not None:
                 with open(args.output, 'a', encoding="utf-8") as out_file:
                     out_file.write(translation + '\n')
@@ -183,6 +187,12 @@ def main(args):
     logging.info(f'Wrote {len(translations)} lines to {args.output}')
     end_time = time.perf_counter()
     logging.info(f'Translation completed in {end_time - start_time:.2f} seconds')
+    # print the average length
+    if len(output_lengths) > 0:
+        avg_len = sum(output_lengths) / len(output_lengths)
+        print(f"Average output length for alpha={args.alpha}: {avg_len:.2f} tokens")
+    else:
+        print("No outputs generated, cannot compute average length.")
 
     # Compute BLEU score if requested
     if getattr(args, 'bleu', False):
