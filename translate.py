@@ -125,7 +125,7 @@ def main(args):
     
 
     translations = []
-    output_length = [] # added for comparing the average length affecred by different alpha value
+    output_lengths = [] # added for comparing the average length affecred by different alpha value
     start_time = time.perf_counter()
 
     
